@@ -1685,6 +1685,12 @@ tbody td {
     max-width: 240px; /* 鍚庢柟闄嶇骇锛孞S 浼氳缃洿绮剧‘鐨勫搴?*/
 }
 
+/* 人员信息管理表格所有数据内容居中 */
+#personnelTable td,
+#personnelTable th {
+    text-align: center;
+}
+
 tbody td:first-child {
     border-left: 1px solid #e2e8f0;
 }

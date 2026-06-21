@@ -6703,16 +6703,6 @@ async function initPersonnel() {
     renderPersonnelTable();
     renderPersonnelPagination();
     
-    // 添加刷新按钮
-    if (typeof addModuleRefreshButton === 'function') {
-        addModuleRefreshButton('personnel', 'personnelData', 'allPersonnelData', '#personnelPage .toolbar-left', () => {
-            allPersonnelData = loadPersonnelData();
-            personnelData = [...allPersonnelData];
-            renderPersonnelTable();
-            renderPersonnelPagination();
-        });
-    }
-    
     const saveToCloudBtn = document.getElementById('saveToCloudBtn');
     if (saveToCloudBtn) {
         saveToCloudBtn.onclick = savePersonnelToCloud;
@@ -8017,6 +8007,7 @@ function updateBatchDeleteButton() {
     const selectedCount = document.getElementById('selectedCount');
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     
+    if (!selectedCount) return;
     selectedCount.textContent = selectedIds.length;
     
     if (selectedIds.length > 0) {
@@ -12427,20 +12418,25 @@ window.renderTaskLedger = function() {
         row.innerHTML = `
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${escapeHtml(task.title || '-')}</td>
-            <td style="text-align: left; padding: 10px; border: 1px solid #ddd; max-width: 150px; word-break: break-all;">${escapeHtml(task.description || '-')}</td>
+            <td style="text-align: left; padding: 10px; border: 1px solid #ddd;">${escapeHtml(task.description || '-')}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${getUserDisplayName(task.assignee) || '-'}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${escapeHtml(priorityText)}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${escapeHtml(statusText)}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${calculateTaskProgress(task)}%</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${task.deadline ? formatDateTime(task.deadline) : '-'}</td>
             <td style="text-align: center; padding: 10px; border: 1px solid #ddd;">${(task.created_at || task.createdAt) ? formatDateTime(task.created_at || task.createdAt) : '-'}</td>
-            <td style="text-align: left; padding: 10px; border: 1px solid #ddd; max-width: 180px; word-break: break-all;">${completionNotes}</td>
-            <td style="text-align: left; padding: 10px; border: 1px solid #ddd; max-width: 200px; word-break: break-all;">${remarkHtml}</td>
+            <td style="text-align: left; padding: 10px; border: 1px solid #ddd;">${completionNotes}</td>
+            <td style="text-align: left; padding: 10px; border: 1px solid #ddd;">${remarkHtml}</td>
         `;
         tbody.appendChild(row);
     });
     
     setupTaskLedgerHeaderFreeze();
+    setTimeout(() => {
+        if (typeof autoAdjustTableColumnWidths === 'function') {
+            autoAdjustTableColumnWidths('taskLedgerTable');
+        }
+    }, 100);
 };
 
 function renderTaskList() {
@@ -19461,25 +19457,30 @@ window.renderHazardLedger = function() {
                 <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">
                     <input type="checkbox" class="hazard-checkbox" data-id="${hazard.id}" onchange="toggleHazardSelection('${hazard.id}')">
                 </td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; font-size: 12px;">${index + 1}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 120px; word-break: break-all; font-size: 12px;">${escapeHtml(hazard.title)}</td>
-                <td style="text-align: left; padding: 5px; border: 1px solid #ddd; max-width: 180px; word-break: break-all; font-size: 12px;">${escapeHtml(hazard.description) || '-'}</td>
-                <td style="text-align: left; padding: 5px; border: 1px solid #ddd; max-width: 120px; font-size: 11px; word-break: break-all;">${treatmentResult}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 90px; word-break: break-all; font-size: 12px;">${escapeHtml(hazard.department) || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 80px; font-size: 12px;">${getUserDisplayName(hazard.reporter) || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 80px; font-size: 12px;">${escapeHtml(hazard.category) || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 90px; word-break: break-all; font-size: 12px;">${escapeHtml(hazard.hazardType) || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 80px; font-size: 12px;">${escapeHtml(hazard.hazardLevel) || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 90px; font-size: 12px;">${hazard.reportDate || '-'}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 70px;"><span class="priority-badge ${priorityClass}">${getHazardPriorityText(hazard.priority)}</span></td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 80px;"><span class="status-badge ${statusClass}">${getHazardStatusText(hazard.status)}</span></td>
-                <td style="text-align: left; padding: 5px; border: 1px solid #ddd; max-width: 120px; font-size: 11px; word-break: break-all; white-space: pre-wrap;">${escapeHtml(remarkContent)}</td>
-                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; max-width: 70px; white-space: nowrap;">${viewBtn}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${index + 1}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.title)}</td>
+                <td style="text-align: left; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.description) || '-'}</td>
+                <td style="text-align: left; padding: 5px; border: 1px solid #ddd;">${treatmentResult}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.department) || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${getUserDisplayName(hazard.reporter) || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.category) || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.hazardType) || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${escapeHtml(hazard.hazardLevel) || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;">${hazard.reportDate || '-'}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;"><span class="priority-badge ${priorityClass}">${getHazardPriorityText(hazard.priority)}</span></td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd;"><span class="status-badge ${statusClass}">${getHazardStatusText(hazard.status)}</span></td>
+                <td style="text-align: left; padding: 5px; border: 1px solid #ddd;">${escapeHtml(remarkContent)}</td>
+                <td style="text-align: center; padding: 5px; border: 1px solid #ddd; white-space: nowrap;">${viewBtn}</td>
             </tr>
         `;
     }).join('');
     
     setupHazardLedgerHeaderFreeze();
+    setTimeout(() => {
+        if (typeof autoAdjustTableColumnWidths === 'function') {
+            autoAdjustTableColumnWidths('hazardLedgerTable');
+        }
+    }, 100);
 };
 
 // 选中的隐患ID列表
@@ -28026,6 +28027,51 @@ function canRejectSamplingAnomaly(anomaly) {
     return false;
 }
 
+// 检查当前用户是否可以将采样点异常升级为隐患
+function canUpgradeSamplingAnomaly(anomaly) {
+    if (!anomaly) return false;
+    const role = getCurrentRole();
+    const status = anomaly.completionStatus || anomaly.completion_status || '';
+    if (status === 'closed') return false;
+    return role === 'topadmin' || role === 'manager' || role === 'leader';
+}
+
+// 将采样点异常升级为隐患
+function upgradeSamplingAnomaly(anomalyId) {
+    const anomaly = samplingAnomalyData.find(a => a.id === anomalyId);
+    if (!anomaly) {
+        showToast('未找到该采样点异常', 'error');
+        return;
+    }
+    const hazard = {
+        id: 'hazard_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+        title: (anomaly.device || '') + ' - ' + (anomaly.tag || ''),
+        description: anomaly.description || '',
+        assignee: anomaly.reporter || '',
+        priority: 'high',
+        deadline: anomaly.deadline || '',
+        status: 'pending',
+        progress: 0,
+        category: '安全类',
+        hazardType: '设备设施',
+        hazardLevel: '一般隐患',
+        reportDate: anomaly.reportDate || anomaly.report_date || '',
+        department: anomaly.area || anomaly.department || '',
+        reporter: anomaly.reporter || '',
+        source: 'sampling_anomaly',
+        sourceId: anomaly.id,
+        createTime: new Date().toLocaleString('zh-CN'),
+        completionStatus: 'pending',
+        completionUser: '',
+        protected: false
+    };
+    if (!hazardData) hazardData = [];
+    hazardData.push(hazard);
+    saveHazards();
+    showToast('已升级为隐患', 'success');
+    filterSamplingAnomalies();
+}
+
 // 检查当前用户是否可以升级采样点异常
 function canEscalateSamplingAnomaly(anomaly) {
     if (!anomaly) return false;
@@ -30128,7 +30174,10 @@ function adjustAllLedgerTableColumns() {
         'teamDataTable',
         'trainingTable',
         'teamPersonnelTable',
-        'personnelTable'
+        'personnelTable',
+        'taskLedgerTable',
+        'hazardLedgerTable',
+        'samplingAnomalyLedgerTable'
     ];
 
     ledgerTables.forEach((tableId) => {
@@ -32079,19 +32128,24 @@ function renderSamplingAnomalyLedger() {
             <td>${escapeHtml(item.device || '-')}</td>
             <td>${escapeHtml(item.tag || '-')}</td>
             <td>${escapeHtml(item.sampleName || '-')}</td>
-            <td style="max-width: 200px; white-space: pre-wrap; font-size: 12px;">${escapeHtml(item.problemDesc || '-')}</td>
+            <td>${escapeHtml(item.problemDesc || '-')}</td>
             <td>${formatDate(item.reportTime)}</td>
             <td>${getUserDisplayName(item.reporter) || '-'}</td>
             <td>${getUserDisplayName(item.rectifier) || '-'}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-            <td style="max-width: 200px; font-size: 12px; white-space: pre-wrap;">${escapeHtml(item.completionNote || '-')}</td>
+            <td>${escapeHtml(item.completionNote || '-')}</td>
             <td>${getUserDisplayName(item.confirmer) || '-'}</td>
-            <td style="max-width: 350px; font-size: 12px; white-space: pre-wrap; text-align: left;">${escapeHtml(remarkContent)}</td>
+            <td style="text-align: left;">${escapeHtml(remarkContent)}</td>
             <td style="text-align: center; white-space: nowrap;">${actionButtons}</td>
         </tr>`;
     }).join('');
     
     setupSamplingAnomalyLedgerHeaderFreeze();
+    setTimeout(() => {
+        if (typeof autoAdjustTableColumnWidths === 'function') {
+            autoAdjustTableColumnWidths('samplingAnomalyLedgerTable');
+        }
+    }, 100);
 }
 
 // 全选/取消全选采样点异常
