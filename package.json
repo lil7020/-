@@ -1,0 +1,69 @@
+{
+  "name": "methanol-work-area-system",
+  "version": "1.0.0",
+  "description": "甲醇作业区管理系统",
+  "main": "main.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "electron": "electron .",
+    "build": "pkg . --targets node18-win-x64 --output 甲醇作业区人员管理系统.exe",
+    "electron:build": "electron-builder"
+  },
+  "pkg": {
+    "scripts": [
+      "server.js",
+      "cloud-sync.js",
+      "script.js"
+    ],
+    "assets": [
+      "*.html",
+      "*.css",
+      "*.js"
+    ]
+  },
+  "build": {
+    "appId": "com.example.methanol-system",
+    "productName": "甲醇作业区人员信息管理系统",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-setup.exe"
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "甲醇作业区人员信息管理系统"
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.6"
+  },
+  "keywords": [
+    "甲醇",
+    "人员管理",
+    "台账"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1"
+  }
+}

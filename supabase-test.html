@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 诊断工具</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #666;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Supabase 数据库诊断工具</h1>
+        
+        <div class="test-section">
+            <h3>📊 Supabase 配置</h3>
+            <div id="configResult" class="result pending">正在检查配置...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 数据库读写测试</h3>
+            <button onclick="testRead()" class="btn-success">1. 测试读取</button>
+            <button onclick="testWrite()" class="btn-success">2. 测试写入</button>
+            <button onclick="testReadAfterWrite()" class="btn-success">3. 测试读写后读取</button>
+            <div id="readResult" class="result"></div>
+            <div id="writeResult" class="result"></div>
+            <div id="readAfterWriteResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 检查所有表</h3>
+            <button onclick="checkAllTables()" class="btn-danger">检查所有表的数据</button>
+            <div id="tablesResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💡 使用说明</h3>
+            <p>1. 首先检查 Supabase 配置是否正确</p>
+            <p>2. 依次点击测试按钮查看结果</p>
+            <p>3. 如果测试失败，请检查：</p>
+            <ul>
+                <li>Supabase URL 和 Key 是否正确</li>
+                <li>网络连接是否正常</li>
+                <li>表的 RLS 策略是否允许读写</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://gfeoegvntxyfotvhklri.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_rBqTlyxcWEa1lwumCvxLLQ_bnimmF06';
+
+        const TABLES = [
+            'inspection_center_data',
+            'inspection_workshop_data',
+            'sampling_car_data',
+            'instrument_data',
+            'honor_data',
+            'patrol_data',
+            'personnel_data',
+            'team_data',
+            'team_personnel_data',
+            'training_data'
+        ];
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'result ' + type;
+        }
+
+        async function supabaseRequest(method, table, data = null, params = {}) {
+            const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
+            
+            if (params) {
+                Object.keys(params).forEach(key => {
+                    url.searchParams.append(key, params[key]);
+                });
+            }
+
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Prefer': 'return=representation'
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url.toString(), options);
+            const result = await response.text();
+            
+            return {
+                status: response.status,
+                ok: response.ok,
+                data: result ? JSON.parse(result) : null
+            };
+        }
+
+        function checkConfig() {
+            const configResult = document.getElementById('configResult');
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+                configResult.textContent = '❌ 配置不完整，请检查 SUPABASE_URL 和 SUPABASE_ANON_KEY';
+                configResult.className = 'result error';
+                return false;
+            }
+
+            const message = `
+✅ Supabase 配置:
+- URL: ${SUPABASE_URL}
+- Key: ${SUPABASE_ANON_KEY.substring(0, 20)}...
+`;
+            configResult.textContent = message;
+            configResult.className = 'result success';
+            return true;
+        }
+
+        async function testRead() {
+            showResult('readResult', '正在测试读取...', 'pending');
+            
+            try {
+                const result = await supabaseRequest('GET', 'sampling_car_data', null, {
+                    select: '*',
+                    limit: 1
+                });
+
+                if (result.ok) {
+                    showResult('readResult', `✅ 读取成功！\n状态码: ${result.status}\n数据: ${JSON.stringify(result.data, null, 2)}`, 'success');
+                } else {
+                    showResult('readResult', `❌ 读取失败！\n状态码: ${result.status}\n错误: ${JSON.stringify(result.data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('readResult', `❌ 读取出错！\n错误: ${error.message}`, 'error');
+            }
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        async function testWrite() {
+            showResult('writeResult', '正在测试写入...', 'pending');
+            
+            const testData = {
+                id: generateUUID(),
+                data: { test: '测试数据', timestamp: new Date().toISOString() },
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const result = await supabaseRequest('POST', 'sampling_car_data', testData);
+
+                if (result.ok || result.status === 201) {
+                    showResult('writeResult', `✅ 写入成功！\n状态码: ${result.status}\n写入数据: ${JSON.stringify(testData, null, 2)}`, 'success');
+                } else {
+                    showResult('writeResult', `❌ 写入失败！\n状态码: ${result.status}\n错误: ${JSON.stringify(result.data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('writeResult', `❌ 写入出错！\n错误: ${error.message}`, 'error');
+            }
+        }
+
+        async function testReadAfterWrite() {
+            showResult('readAfterWriteResult', '正在读取最新数据...', 'pending');
+            
+            try {
+                const result = await supabaseRequest('GET', 'sampling_car_data', null, {
+                    select: '*',
+                    order: 'created_at.desc',
+                    limit: 1
+                });
+
+                if (result.ok) {
+                    showResult('readAfterWriteResult', `✅ 读取最新数据成功！\n状态码: ${result.status}\n最新记录: ${JSON.stringify(result.data, null, 2)}`, 'success');
+                } else {
+                    showResult('readAfterWriteResult', `❌ 读取失败！\n状态码: ${result.status}\n错误: ${JSON.stringify(result.data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('readAfterWriteResult', `❌ 读取出错！\n错误: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkAllTables() {
+            showResult('tablesResult', '正在检查所有表...', 'pending');
+            
+            let message = '';
+            
+            for (const table of TABLES) {
+                try {
+                    const result = await supabaseRequest('GET', table, null, {
+                        select: 'id,created_at,updated_at',
+                        limit: 1
+                    });
+
+                    if (result.ok) {
+                        const countResult = await supabaseRequest('GET', table, null, {
+                            select: 'count'
+                        });
+                        const count = countResult.ok && countResult.data ? countResult.data.length : '?';
+                        message += `✅ ${table}: OK (${count} 条记录)\n`;
+                    } else {
+                        message += `❌ ${table}: ${result.status} - ${JSON.stringify(result.data)}\n`;
+                    }
+                } catch (error) {
+                    message += `❌ ${table}: ${error.message}\n`;
+                }
+                
+                // 延迟一下避免请求过快
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            showResult('tablesResult', message, message.includes('❌') ? 'error' : 'success');
+        }
+
+        // 页面加载时自动检查配置
+        window.onload = checkConfig;
+    </script>
+</body>
+</html>

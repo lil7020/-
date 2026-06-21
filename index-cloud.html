@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甲醇作业区人员信息管理系统 - 云端版</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://gfeoegvntxyfotvhklri.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_rBqTlyxcWEa1lwumCvxLLQ_bnimmF06';
+        window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.isCloudMode = true;
+    </script>
+</head>
+<body>
+    <div id="app">
+        <div id="login-container">
+            <div class="login-box">
+                <h1>甲醇作业区人员信息管理系统</h1>
+                <p>云端版本 - 数据实时共享</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="username" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="password" placeholder="请输入密码" required>
+                    </div>
+                    <button type="submit" class="login-btn">登录</button>
+                </form>
+                <p class="hint">默认账号：lil7020 / lil7020</p>
+            </div>
+        </div>
+        <div id="main-container" style="display: none;">
+            <header>
+                <h1>甲醇作业区人员信息管理系统</h1>
+                <div class="header-right">
+                    <span id="current-user"></span>
+                    <button id="logout-btn" class="logout-btn">退出登录</button>
+                </div>
+            </header>
+            <nav class="nav-container">
+                <div class="nav-card" data-module="personnel">👥 人员信息管理</div>
+                <div class="nav-card" data-module="training">📚 副班培训成绩</div>
+                <div class="nav-card" data-module="teams">🏆 红旗班组名次</div>
+                <div class="nav-card" data-module="teamPersonnel">👨‍👩‍👧‍👦 班组人员</div>
+                <div class="nav-card" data-module="inspection">🔍 检查问题台账</div>
+                <div class="nav-card" data-module="honor">🏅 获得荣誉台账</div>
+                <div class="nav-card" data-module="patrol">📋 违章违纪台账</div>
+                <div class="nav-card" data-module="samplingCar">🚗 采样车维修台账</div>
+                <div class="nav-card" data-module="instrument">🔧 仪器维修台账</div>
+            </nav>
+            <main id="main-content"></main>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="cloud-sync.js"></script>
+</body>
+</html>

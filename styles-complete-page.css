@@ -1,0 +1,143 @@
+/* 标记完成全屏页面样式 */
+.task-page .complete-form-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    width: 90%;
+}
+
+.task-page .complete-form {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.task-page .complete-form .form-header {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 24px 32px;
+}
+
+.task-page .complete-form .form-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.task-page .complete-form .form-content {
+    padding: 24px 32px;
+    border-bottom: 1px solid #eee;
+}
+
+.task-page .complete-form .form-section {
+    padding: 24px 32px;
+}
+
+.task-page .complete-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px 32px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.task-page .complete-form .form-group label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+.task-page .complete-form .form-group textarea {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 15px;
+    min-height: 180px;
+    resize: vertical;
+    box-sizing: border-box;
+    background: #fffbeb;
+    transition: border-color 0.2s ease;
+}
+
+.task-page .complete-form .form-group textarea:focus {
+    outline: none;
+    border-color: #10b981;
+}
+
+.task-page .complete-form .form-group textarea::placeholder {
+    color: #9ca3af;
+}
+
+.task-page .complete-form .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.task-page .complete-form .detail-row:last-child {
+    border-bottom: none;
+}
+
+.task-page .complete-form .detail-label {
+    font-weight: 500;
+    color: #666;
+    font-size: 15px;
+}
+
+.task-page .complete-form .detail-value {
+    font-weight: 500;
+    color: #333;
+    font-size: 15px;
+    text-align: right;
+    max-width: 65%;
+    word-break: break-all;
+}
+
+.task-page .complete-form .detail-value.priority-high {
+    color: #dc2626;
+}
+
+.task-page .complete-form .detail-value.priority-medium {
+    color: #d97706;
+}
+
+.task-page .complete-form .detail-value.priority-low {
+    color: #059669;
+}
+
+.task-page .complete-form .detail-value.status-pending {
+    color: #f59e0b;
+}
+
+.task-page .complete-form .detail-value.status-progress {
+    color: #3b82f6;
+}
+
+.task-page .complete-form .detail-value.status-completed {
+    color: #10b981;
+}
+
+.task-page .complete-form .detail-value.status-closed {
+    color: #8b5cf6;
+}
+
+@media (max-width: 768px) {
+    .task-page .complete-form-container {
+        margin: 20px 15px;
+        width: auto;
+    }
+
+    .task-page .complete-form .detail-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .task-page .complete-form .detail-value {
+        text-align: left;
+        max-width: 100%;
+    }
+}

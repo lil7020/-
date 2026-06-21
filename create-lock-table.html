@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建上传锁表</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 20px 0;
+            font-size: 24px;
+        }
+        .code-block {
+            background: #f6f8fa;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 20px 0;
+            border: 1px solid #e1e4e8;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+        .step {
+            margin: 16px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+        .step::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 创建上传锁表</h1>
+        <p>此工具将帮助您在 Supabase 中创建上传锁表，用于防止多人同时上传数据导致冲突。</p>
+        
+        <div class="status info" id="infoStatus">
+            <strong>操作步骤：</strong>
+            <div class="step">1. 复制下方的 SQL 代码</div>
+            <div class="step">2. 登录 <a href="https://supabase.com/dashboard" target="_blank">Supabase 后台</a></div>
+            <div class="step">3. 进入您的项目 → 点击左侧 "SQL Editor"</div>
+            <div class="step">4. 粘贴代码并点击 "RUN"</div>
+        </div>
+
+        <div class="code-block" id="sqlCode">
+-- 创建上传锁表
+CREATE TABLE sync_lock (
+    id TEXT PRIMARY KEY,
+    username TEXT NOT NULL,
+    lock_time TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- 添加行级安全策略（允许所有用户访问）
+ALTER TABLE sync_lock ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all users to access sync_lock" 
+ON sync_lock 
+FOR ALL 
+USING (true);
+
+-- 创建索引（可选）
+CREATE INDEX IF NOT EXISTS idx_sync_lock_id ON sync_lock(id);
+        </div>
+
+        <button onclick="copyCode()">📋 复制 SQL 代码</button>
+        
+        <div class="status" id="copyStatus"></div>
+
+        <script>
+            function copyCode() {
+                const code = document.getElementById('sqlCode').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const status = document.getElementById('copyStatus');
+                    status.className = 'status success';
+                    status.textContent = '✓ SQL 代码已复制到剪贴板！';
+                    setTimeout(() => {
+                        status.className = 'status';
+                    }, 3000);
+                }).catch(err => {
+                    const status = document.getElementById('copyStatus');
+                    status.className = 'status error';
+                    status.textContent = '✗ 复制失败，请手动选择复制';
+                });
+            }
+        </script>
+    </div>
+</body>
+</html>

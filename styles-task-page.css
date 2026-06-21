@@ -1,0 +1,618 @@
+
+
+/* 任务完成情况页面样式 */
+.task-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-page .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.task-page .task-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.task-page .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border-left: 6px solid #6c757d;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.task-page .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.task-page .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+}
+
+.task-page .stat-card.task-stat-pending {
+    border-left-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.task-page .stat-card.task-stat-pending::after {
+    content: '📋';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    opacity: 0.2;
+}
+
+.task-page .stat-card.task-stat-progress {
+    border-left-color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.task-page .stat-card.task-stat-progress::after {
+    content: '⚡';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    opacity: 0.2;
+}
+
+.task-page .stat-card.task-stat-completed {
+    border-left-color: #10b981;
+    background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+}
+
+.task-page .stat-card.task-stat-completed::after {
+    content: '✅';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    opacity: 0.2;
+}
+
+.task-page .stat-card.task-stat-closed {
+    border-left-color: #8b5cf6;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+}
+
+.task-page .stat-card.task-stat-closed::after {
+    content: '🏆';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    opacity: 0.2;
+}
+
+.task-page .stat-card .stat-value {
+    font-size: 48px;
+    font-weight: 800;
+    color: #1f2937;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.task-page .stat-card .stat-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b5563;
+    margin-top: 12px;
+    display: block;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+.task-page .toolbar {
+    background: white;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.task-page .toolbar-left {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.task-page .toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.task-page .toolbar-right select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 120px;
+}
+
+.task-page .task-list-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.task-page .task-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.task-page .task-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 5px solid #6c757d;
+}
+
+.task-page .task-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* 超期隐患红色卡片样式 */
+.task-page .task-card.overdue {
+    background: #fef2f2;
+    border-left-color: #dc2626;
+    border: 2px solid #fecaca;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.task-page .task-card.overdue:hover {
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.task-page .task-card .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.task-page .task-card .task-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+    flex: 1;
+}
+
+.task-page .task-card .task-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.task-page .task-status.pending {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.task-page .task-status.progress {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.task-page .task-status.completed {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.task-page .task-status.closed {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.task-page .task-card .task-info {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.task-page .task-card .task-assignee {
+    color: #666;
+}
+
+.task-page .task-card .task-priority {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.task-page .priority-high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.task-page .priority-medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.task-page .priority-low {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.task-page .task-progress-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.task-page .task-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.task-page .task-card .task-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #888;
+}
+
+.task-page .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.task-page .empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.task-page .empty-state p {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .task-page .task-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .task-page .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .task-page .toolbar-left,
+    .task-page .toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .task-page .task-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 台账页面样式 */
+.ledger-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    margin-top: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    background: white;
+}
+
+.table-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 0 20px;
+}
+
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    max-height: calc(100vh - 280px);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.table-scroll {
+    overflow: visible;
+}
+
+.ledger-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ledger-table thead th {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #333;
+    z-index: 11;
+}
+
+.ledger-table th,
+.ledger-table td {
+    padding: 14px 12px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.ledger-table th {
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.ledger-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.ledger-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: scale(1.002);
+}
+
+.ledger-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.ledger-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.ledger-table tbody tr:hover td {
+    border-color: #e2e8f0;
+}
+
+.ledger-table .priority-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ledger-table .priority-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.ledger-table .priority-badge.high {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+}
+
+.ledger-table .priority-badge.high::before {
+    background: #dc2626;
+}
+
+.ledger-table .priority-badge.medium {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    color: #d97706;
+}
+
+.ledger-table .priority-badge.medium::before {
+    background: #d97706;
+}
+
+.ledger-table .priority-badge.low {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #059669;
+}
+
+.ledger-table .priority-badge.low::before {
+    background: #059669;
+}
+
+.ledger-table .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.ledger-table .status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.ledger-table .status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.ledger-table .status-badge.pending {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+}
+
+.ledger-table .status-badge.pending::before {
+    background: #dc2626;
+}
+
+.ledger-table .status-badge.progress,
+.ledger-table .status-badge.waitingLeaderConfirm,
+.ledger-table .status-badge.waitingAdminConfirm,
+.ledger-table .status-badge.leaderConfirmed,
+.ledger-table .status-badge.leaderRectifying,
+.ledger-table .status-badge.adminRectifying,
+.ledger-table .status-badge.waitingTopAdminConfirm,
+.ledger-table .status-badge.waitingTopAdminHandle {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+}
+
+.ledger-table .status-badge.progress::before,
+.ledger-table .status-badge.waitingLeaderConfirm::before,
+.ledger-table .status-badge.waitingAdminConfirm::before,
+.ledger-table .status-badge.leaderConfirmed::before,
+.ledger-table .status-badge.leaderRectifying::before,
+.ledger-table .status-badge.adminRectifying::before,
+.ledger-table .status-badge.waitingTopAdminConfirm::before,
+.ledger-table .status-badge.waitingTopAdminHandle::before {
+    background: #2563eb;
+}
+
+.ledger-table .status-badge.completed {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #059669;
+}
+
+.ledger-table .status-badge.completed::before {
+    background: #059669;
+    animation: none;
+}
+
+.ledger-table .status-badge.closed {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    color: #7c3aed;
+}
+
+.ledger-table .status-badge.closed::before {
+    background: #7c3aed;
+    animation: none;
+}
+
+.ledger-table .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ledger-table .progress-bar .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+    position: relative;
+}
+
+.ledger-table .progress-bar .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.ledger-table .completion-note {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.4;
+    padding: 4px 8px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.ledger-table .completion-note:hover {
+    background: #f1f5f9;
+    cursor: help;
+}
+
+.ledger-container .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.ledger-container .empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.ledger-container .empty-state p {
+    color: #6b7280;
+    font-size: 16px;
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 连接测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .config-info {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .config-info code {
+            display: block;
+            margin: 5px 0;
+            color: #1e40af;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .result.success {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+            display: block;
+        }
+        .result.error {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            display: block;
+        }
+        .result.warning {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            display: block;
+        }
+        .loading {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        pre {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .check-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .check-item.pass {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .check-item.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Supabase 连接测试工具</h1>
+    
+    <div class="test-section">
+        <h2>📋 当前配置</h2>
+        <div class="config-info">
+            <strong>Supabase URL:</strong>
+            <code id="configUrl"></code>
+            <strong>Supabase Key:</strong>
+            <code id="configKey"></code>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 测试项目</h2>
+        <button id="runAllTests" onclick="runAllTests()">▶️ 运行所有测试</button>
+        <button id="clearCache" onclick="clearCache()">🗑️ 清除浏览器缓存</button>
+        
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>💡 解决方案</h2>
+        <div id="solutions" style="display: none;">
+            <h3>根据测试结果，建议您：</h3>
+            <div id="solutionList"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://gfeoegvntxyfotvhklri.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_rBqTlyxcWEa1lwumCvxLLQ_bnimmF06';
+        
+        document.getElementById('configUrl').textContent = SUPABASE_URL;
+        document.getElementById('configKey').textContent = SUPABASE_ANON_KEY;
+        
+        let testResults = [];
+        
+        async function testConnection() {
+            const result = { name: '连接测试', success: false };
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    result.success = true;
+                    result.message = '✅ 连接成功！Supabase服务正常';
+                } else if (response.status === 401) {
+                    result.message = '❌ 401错误 - API Key无效或已过期';
+                } else if (response.status === 404) {
+                    result.message = '❌ 404错误 - 项目不存在或URL错误';
+                } else {
+                    result.message = `❌ HTTP ${response.status} - ${response.statusText}`;
+                }
+                result.status = response.status;
+            } catch (error) {
+                result.message = `❌ 网络错误: ${error.message}`;
+                result.error = error;
+            }
+            return result;
+        }
+        
+        async function testTableAccess() {
+            const result = { name: '表访问测试', success: false };
+            const tables = ['inspection_data', 'personnel_data', 'team_data'];
+            
+            try {
+                for (const table of tables) {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=id&limit=1`, {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        result.success = true;
+                        result.table = table;
+                        result.message = `✅ 可以访问表: ${table}`;
+                        break;
+                    } else if (response.status === 401) {
+                        result.message = '❌ 401错误 - 请检查API Key是否有效';
+                        result.status = 401;
+                        break;
+                    }
+                }
+                
+                if (!result.success && !result.status) {
+                    result.message = '❌ 无法访问任何表';
+                }
+            } catch (error) {
+                result.message = `❌ 错误: ${error.message}`;
+                result.error = error;
+            }
+            return result;
+        }
+        
+        async function checkBrowserCache() {
+            const result = { name: '浏览器缓存检查', success: true };
+            
+            try {
+                // 检查localStorage
+                if (localStorage.length > 0) {
+                    result.cacheInfo = `localStorage中有 ${localStorage.length} 个项目`;
+                }
+                
+                // 检查是否有旧的token
+                const oldToken = localStorage.getItem('supabaseToken');
+                if (oldToken) {
+                    result.warning = '发现旧的supabaseToken，可能导致401错误';
+                }
+                
+                result.message = result.warning || '✅ 缓存检查完成';
+            } catch (error) {
+                result.message = `⚠️ 缓存检查出错: ${error.message}`;
+            }
+            
+            return result;
+        }
+        
+        function generateSolutions(results) {
+            const solutionList = document.getElementById('solutionList');
+            const solutionsDiv = document.getElementById('solutions');
+            let solutions = [];
+            
+            const has401 = results.some(r => r.status === 401);
+            const hasNetworkError = results.some(r => r.error);
+            
+            if (has401) {
+                solutions.push(`
+                    <div class="check-item fail">
+                        <strong>API Key 问题 (最可能的原因)</strong>
+                        <p>您的 API Key 可能已过期或无效。请执行以下操作：</p>
+                        <ol>
+                            <li>登录 <a href="https://supabase.com/dashboard" target="_blank">Supabase Dashboard</a></li>
+                            <li>选择您的项目</li>
+                            <li>进入 Settings → API</li>
+                            <li>复制新的 <code>anon public</code> key</li>
+                            <li>更新 cloud-sync.js 中的 <code>SUPABASE_ANON_KEY</code> 值</li>
+                        </ol>
+                    </div>
+                `);
+            }
+            
+            if (hasNetworkError) {
+                solutions.push(`
+                    <div class="check-item fail">
+                        <strong>网络问题</strong>
+                        <p>可能无法连接到Supabase服务器。请：</p>
+                        <ol>
+                            <li>检查网络连接</li>
+                            <li>尝试访问 <a href="${SUPABASE_URL}" target="_blank">${SUPABASE_URL}</a></li>
+                            <li>检查防火墙或代理设置</li>
+                        </ol>
+                    </div>
+                `);
+            }
+            
+            solutions.push(`
+                <div class="check-item pass">
+                    <strong>其他解决方案</strong>
+                    <ul>
+                        <li>清除浏览器缓存和Cookie</li>
+                        <li>尝试使用无痕/隐私模式</li>
+                        <li>确认Supabase项目没有被暂停或删除</li>
+                        <li>检查Supabase项目的使用量是否超过免费额度</li>
+                    </ul>
+                </div>
+            `);
+            
+            solutionList.innerHTML = solutions.join('');
+            solutionsDiv.style.display = 'block';
+        }
+        
+        async function runAllTests() {
+            const btn = document.getElementById('runAllTests');
+            const resultsDiv = document.getElementById('testResults');
+            
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 测试中...';
+            resultsDiv.innerHTML = '<p class="loading">正在运行测试...</p>';
+            
+            testResults = [];
+            
+            // 运行测试
+            const connectionTest = await testConnection();
+            testResults.push(connectionTest);
+            
+            const tableTest = await testTableAccess();
+            testResults.push(tableTest);
+            
+            const cacheTest = await checkBrowserCache();
+            testResults.push(cacheTest);
+            
+            // 显示结果
+            let html = '<div style="margin-top: 20px;">';
+            testResults.forEach(result => {
+                const className = result.success ? 'pass' : 'fail';
+                html += `
+                    <div class="check-item ${className}">
+                        <strong>${result.name}</strong>
+                        <p>${result.message}</p>
+                        ${result.table ? `<p>可访问表: ${result.table}</p>` : ''}
+                        ${result.cacheInfo ? `<p>${result.cacheInfo}</p>` : ''}
+                        ${result.warning ? `<p style="color: #f59e0b;">⚠️ ${result.warning}</p>` : ''}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            resultsDiv.innerHTML = html;
+            
+            // 生成解决方案
+            generateSolutions(testResults);
+            
+            btn.disabled = false;
+            btn.innerHTML = '▶️ 运行所有测试';
+        }
+        
+        function clearCache() {
+            if (confirm('确定要清除localStorage吗？这将删除所有本地存储的数据。')) {
+                localStorage.clear();
+                alert('✅ 缓存已清除。请刷新页面重新测试。');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
