@@ -161,15 +161,23 @@
             <header>
                 <div class="header-content">
                     <div class="header-title">
-                        <h1>甲醇作业区管理系统</h1>
-                        <p>综合管理平台</p>
+                        <span class="header-logo">👷</span>
+                        <div class="header-title-text">
+                            <h1>甲醇作业区管理系统</h1>
+                            <p>综合管理平台</p>
+                        </div>
                     </div>
                     <div class="header-user" id="navHeaderUser">
-                        <span class="user-icon">👤</span>
-                        <span id="navUserName">管理员</span>
-                        <button id="changePwdBtn" class="user-manage-btn" onclick="openChangePasswordModal()" style="display: none;">修改密码</button>
-                        <button id="userManageBtn" class="user-manage-btn" onclick="openUserManagementModal()" style="display: none;">用户管理</button>
-                        <button id="navLogoutBtn" class="logout-btn">退出</button>
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info-area">
+                            <span class="user-label">当前用户</span>
+                            <span id="navUserName">管理员</span>
+                        </div>
+                        <div class="user-actions">
+                            <button id="changePwdBtn" class="user-manage-btn" onclick="openChangePasswordModal()" style="display: none;">修改密码</button>
+                            <button id="userManageBtn" class="user-manage-btn" onclick="openUserManagementModal()" style="display: none;">用户管理</button>
+                            <button id="navLogoutBtn" class="logout-btn">退出</button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -315,7 +323,7 @@
                         <table id="personnelTable">
                             <thead>
                                 <tr>
-                                    <th class="checkbox-col fixed-col"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"></th>
+                                    <th class="checkbox-col"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"></th>
                                     <th class="fixed-col">序号</th>
                                     <th class="fixed-col">人员编号</th>
                                     <th class="fixed-col">班次</th>

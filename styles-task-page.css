@@ -397,6 +397,15 @@
     vertical-align: middle;
 }
 
+/* 台账表格内容列自动适应宽度，最长约30个中文字符超出换行 */
+.ledger-table td {
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: auto;
+    max-width: 460px;
+}
+
 .ledger-table th {
     font-weight: 600;
     font-size: 13px;

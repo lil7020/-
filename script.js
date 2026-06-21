@@ -4874,7 +4874,7 @@ function renderInspectionTable() {
     const inspectionHeaders = ['责任人', unitLabel, '检查时间', '问题', '整改期限', '整改措施', '类别', '整改负责人', '检查人', '整改情况'];
     
     // 当用户没有编辑权限时（普通用户和班长），不渲染复选框列
-    const checkboxColumn = canEdit ? '<th style="min-width: 40px;"><input type="checkbox" id="inspectionSelectAll" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllInspectionSelection(this.checked)" style="width: 18px; height: 18px; cursor: pointer;"></th>' : '';
+    const checkboxColumn = canEdit ? '<th style="min-width: 40px;"><input type="checkbox" id="inspectionSelectAll" ' + (allSelected ? 'checked' : '') + ' onchange="toggleAllInspectionSelection(this.checked)" style="width: 20px; height: 20px; cursor: pointer;"></th>' : '';
     tableHead.innerHTML = `
         <tr>
             ${checkboxColumn}
@@ -4923,7 +4923,7 @@ function renderInspectionTable() {
             <td>
                 <input type="checkbox" ${isChecked ? 'checked' : ''} 
                        onchange="toggleInspectionSelection('${item.id}', this.checked)"
-                       style="width: 18px; height: 18px; cursor: pointer;">
+                       style="width: 20px; height: 20px; cursor: pointer;">
             </td>
         ` : '';
         
@@ -6451,8 +6451,8 @@ async function syncModuleFromCloud(moduleKey, storageKey, arrayRef, isObject = f
         const tableName = moduleKey === 'personnel' ? 'personnel_data' :
                          moduleKey === 'training' ? 'training_data' :
                          moduleKey === 'team' ? 'team_data' :
-                         moduleKey === 'inspection' ? 'inspection_center_data' :
-                         moduleKey === 'centerInspection' ? 'inspection_center_data' :
+                         moduleKey === 'inspection' ? 'inspection_center_records' :
+                         moduleKey === 'centerInspection' ? 'inspection_center_records' :
                          moduleKey === 'workshopInspection' ? 'inspection_workshop_data' :
                          moduleKey === 'honor' ? 'honor_data' :
                          moduleKey === 'patrol' ? 'violation_discipline_data' :
@@ -7675,7 +7675,7 @@ function renderPersonnelTable() {
         const row = document.createElement('tr');
         const isSelected = selectedIds.includes(person.id);
         row.innerHTML = `
-            <td class="checkbox-col fixed-col"><input type="checkbox" class="row-checkbox" data-id="${person.id}" ${isSelected ? 'checked' : ''} onchange="toggleRowSelection(${person.id})"></td>
+            <td class="checkbox-col"><input type="checkbox" class="row-checkbox" data-id="${person.id}" ${isSelected ? 'checked' : ''} onchange="toggleRowSelection(${person.id})"></td>
             <td class="fixed-col">${startIndex + index + 1}</td>
             <td class="fixed-col">${person.personnelNo}</td>
             <td class="fixed-col">${person.shift}</td>
@@ -11348,6 +11348,18 @@ const DataLoadingOverlay = {
     // 创建提示UI
     create() {
         if (this.overlay) return;
+
+        // 添加动画样式
+        if (!document.getElementById('loadingAnimStyle')) {
+            const s = document.createElement('style');
+            s.id = 'loadingAnimStyle';
+            s.textContent = `
+                @keyframes loadingSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                @keyframes loadingPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+                @keyframes loadingBarShine { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+            `;
+            document.head.appendChild(s);
+        }
         
         this.overlay = document.createElement('div');
         this.overlay.id = 'dataLoadingOverlay';
@@ -11357,7 +11369,8 @@ const DataLoadingOverlay = {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(30,41,59,0.9) 100%);
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -11368,68 +11381,95 @@ const DataLoadingOverlay = {
         
         const content = document.createElement('div');
         content.style.cssText = `
-            background: white;
-            padding: 40px 60px;
-            border-radius: 16px;
+            background: rgba(255,255,255,0.95);
+            padding: 36px 48px;
+            border-radius: 20px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+            max-width: 440px;
+            width: 90%;
+            transform: translateY(20px);
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
         `;
+        content.id = 'loadingContent';
+        requestAnimationFrame(() => {
+            content.style.transform = 'translateY(0)';
+            content.style.opacity = '1';
+        });
         
         const icon = document.createElement('div');
         icon.id = 'loadingIcon';
         icon.style.cssText = `
-            font-size: 60px;
-            margin-bottom: 20px;
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: loadingSpin 1.2s linear infinite;
         `;
-        icon.textContent = '🔄';
+        icon.textContent = '⏳';
         
         const title = document.createElement('div');
         title.id = 'loadingTitle';
         title.style.cssText = `
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
         `;
-        title.textContent = '正在加载数据...';
+        title.textContent = '正在加载数据';
         
         const moduleName = document.createElement('div');
         moduleName.id = 'loadingModuleName';
         moduleName.style.cssText = `
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 25px;
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 24px;
+            padding: 6px 16px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            display: inline-block;
         `;
         moduleName.textContent = '';
         
         const progressContainer = document.createElement('div');
         progressContainer.style.cssText = `
             width: 100%;
-            height: 12px;
-            background: #e5e7eb;
-            border-radius: 6px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         `;
         
         this.progressBar = document.createElement('div');
         this.progressBar.style.cssText = `
             height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #10b981);
             width: 0%;
-            transition: width 0.3s;
-            border-radius: 6px;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: loadingBarShine 1.5s linear infinite;
         `;
         
         progressContainer.appendChild(this.progressBar);
         
         this.progressText = document.createElement('div');
         this.progressText.style.cssText = `
-            font-size: 14px;
-            color: #888;
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
         `;
-        this.progressText.textContent = '0%';
+        this.progressText.textContent = '准备中...';
+        
+        const dots = document.createElement('span');
+        dots.id = 'loadingDots';
+        dots.style.cssText = `
+            display: inline-block;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        `;
+        dots.textContent = '';
         
         content.appendChild(icon);
         content.appendChild(title);
@@ -11472,8 +11512,20 @@ const DataLoadingOverlay = {
     // 隐藏提示
     hide(success = true) {
         if (!this.overlay) return;
-        
+
+        const content = document.getElementById('loadingContent');
+        if (content) {
+            content.style.transform = 'translateY(-10px)';
+            content.style.opacity = '0';
+        }
         this.updateProgress(100, success ? '✅ 完成' : '❌ 失败');
+        if (success) {
+            const icon = document.getElementById('loadingIcon');
+            if (icon) {
+                icon.textContent = '✅';
+                icon.style.animation = 'none';
+            }
+        }
         
         // 延迟关闭以便看到最终状态
         setTimeout(() => {
@@ -11580,7 +11632,7 @@ async function lazyLoadModuleData(moduleId, retryCount = 0) {
             const tableNameMap = {
                 'training': 'training_data',
                 'team': 'team_data',
-                'inspection': 'inspection_center_data',
+                'inspection': 'inspection_center_records',
                 'honor': 'honor_data',
                 'patrol': 'patrol_data',
                 'samplingCar': 'sampling_car_data',
@@ -29952,15 +30004,30 @@ function autoAdjustTableColumnWidths(tableId) {
 
     // 计算15个中文字符的宽度
     const singleCharWidth = calculateChineseCharWidth();
-    const maxColumnWidth = singleCharWidth * 15;
     const minColumnWidth = 80;
+
+    // 测量单元格的 padding + border 横向补偿（因 td 使用 border-box，设 width 时会吃掉这部分空间）
+    let horizontalPad = 24; // 默认补偿
+    if (rows.length > 0) {
+        const sampleCell = rows[0].querySelector('td');
+        if (sampleCell) {
+            const cs = window.getComputedStyle(sampleCell);
+            const pl = parseFloat(cs.paddingLeft) || 0;
+            const pr = parseFloat(cs.paddingRight) || 0;
+            const bl = parseFloat(cs.borderLeftWidth) || 0;
+            const br = parseFloat(cs.borderRightWidth) || 0;
+            horizontalPad = pl + pr + bl + br;
+        }
+    }
+    // maxColumnWidth = 15个汉字的内容宽度 + 横向补偿 = 总列宽
+    const maxColumnWidth = singleCharWidth * 15 + horizontalPad;
 
     // 获取所有列
     const headerCells = thead.querySelectorAll('th');
     const numColumns = headerCells.length;
 
     // 计算每列的最大内容长度 - 同时考虑表头和数据
-    const columnWidths = new Array(numColumns).fill(minColumnWidth);
+    const columnWidths = new Array(numColumns).fill(minColumnWidth + horizontalPad);
 
     // 1. 首先测量表头内容的宽度（重要，确保长表头可以显示）
     headerCells.forEach((th, index) => {
@@ -29977,7 +30044,7 @@ function autoAdjustTableColumnWidths(tableId) {
             }
             // 表头更宽松的宽度限制，确保长表头可以适应
             const estimatedWidth = Math.min(
-                Math.max(contentLength * (singleCharWidth / 2), minColumnWidth), maxColumnWidth);
+                Math.max(contentLength * (singleCharWidth / 2) + horizontalPad, minColumnWidth + horizontalPad), maxColumnWidth);
             if (estimatedWidth > columnWidths[index]) {
                 columnWidths[index] = estimatedWidth;
             }
@@ -30004,7 +30071,7 @@ function autoAdjustTableColumnWidths(tableId) {
                     }
 
                     const estimatedWidth = Math.min(
-                        Math.max(contentLength * (singleCharWidth / 2), minColumnWidth),
+                        Math.max(contentLength * (singleCharWidth / 2) + horizontalPad, minColumnWidth + horizontalPad),
                         maxColumnWidth);
 
                     if (estimatedWidth > columnWidths[cellIndex]) {
@@ -30015,26 +30082,29 @@ function autoAdjustTableColumnWidths(tableId) {
         });
     }
 
-    // 3. 应用计算好的列宽到表头和单元格
+    // 3. 计算总列宽并设置 table 宽度（确保 fixed 布局按实际像素分配）
+    const totalWidth = columnWidths.reduce((s, w) => s + w, 0);
+    table.style.width = totalWidth + 'px';
+    table.style.minWidth = totalWidth + 'px';
+    table.style.maxWidth = totalWidth + 'px';
+    table.style.tableLayout = 'fixed';
+
+    // 4. 应用列宽到表头
     headerCells.forEach((th, index) => {
         const width = Math.round(columnWidths[index]);
-        th.style.minWidth = `${width}px`;
-        th.style.maxWidth = `${maxColumnWidth}px`;
         th.style.width = `${width}px`;
-        th.style.whiteSpace = 'normal'; // 确保表头可以自动换行
+        th.style.whiteSpace = 'normal';
         th.style.wordBreak = 'break-word';
         th.style.overflowWrap = 'break-word';
     });
 
-    // 4. 应用列宽到数据单元格
+    // 5. 应用列宽到数据单元格
     if (rows.length > 0) {
         rows.forEach((row) => {
             const cells = row.querySelectorAll('td');
             cells.forEach((cell, cellIndex) => {
                 if (cellIndex < numColumns) {
                     const width = Math.round(columnWidths[cellIndex]);
-                    cell.style.minWidth = `${width}px`;
-                    cell.style.maxWidth = `${maxColumnWidth}px`;
                     cell.style.width = `${width}px`;
                     cell.style.whiteSpace = 'normal';
                     cell.style.wordBreak = 'break-word';
