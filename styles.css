@@ -670,8 +670,8 @@ input:focus, textarea:focus, select:focus {
 .instrument-page {
     width: 100%;
     min-height: 100vh;
-    padding-bottom: 80px;
-    overflow: hidden; /* 关键：页面本身不滚动，让 table-container 成为唯一滚动容器 */
+    padding-bottom: 0;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     background: #f5f7fa;
@@ -682,7 +682,7 @@ input:focus, textarea:focus, select:focus {
 .team-personnel-page .container,
 .patrol-page .container,
 .inspection-page .container {
-    padding-bottom: 80px;
+    padding-bottom: 0;
 }
 
 .team-page .container {
@@ -730,7 +730,7 @@ input:focus, textarea:focus, select:focus {
 header {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     color: #fff;
-    padding: 14px 28px;
+    padding: 6px 12px;
     flex-shrink: 0;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     min-height: auto;
@@ -926,11 +926,11 @@ header::before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 6px 10px;
     background: #fff;
     border-bottom: 1px solid #e9ecef;
     flex-shrink: 0;
-    gap: 16px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
@@ -1542,9 +1542,27 @@ table td {
 }
 
 
+/* 刷新数据/显示台账按钮 - 独占一行、充满宽度 */
+[id*="refresh"][id*="Btn"],
+[id*="refreshBtn_"],
+[id*="show"][id*="LedgerBtn"] {
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    white-space: nowrap;
+    margin: 4px 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
 .table-wrapper {
     flex: 1;
-    padding: 20px;
+    padding: 4px;
     display: flex;
     flex-direction: column;
 }
@@ -1554,11 +1572,11 @@ table td {
     overflow-x: auto;
     overflow-y: auto;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     scrollbar-width: thin;
     scrollbar-color: #c1c1c1 #f1f1f1;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 120px);
 }
 
 .table-scroll {
@@ -1732,9 +1750,9 @@ tbody tr:hover td {
    ============================================================ */
 .table-container {
     position: relative;
-    overflow: auto; /* 妯悜+绾靛悜婊氬姩閮藉湪鏈鍣ㄥ唴瀹屾垚锛坰ticky 鐨勫弬鑰冪偣锛?*/
-    max-height: calc(100vh - 280px);
-    height: 60vh; /* 缁欎竴涓ǔ瀹氶珮搴﹀熀鍑嗭紝閬垮厤鍐呭灏戞椂娌℃湁婊氬姩鏁堟灉 */
+    overflow: auto;
+    max-height: calc(100vh - 120px);
+    height: 60vh;
     width: 100%;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
@@ -1798,11 +1816,11 @@ tbody tr:last-child td {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 6px;
     background: #fff;
     border-top: 1px solid #e9ecef;
     flex-shrink: 0;
-    gap: 8px;
+    gap: 4px;
 }
 
 .pagination button {
@@ -2841,7 +2859,7 @@ tbody tr:last-child td {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin: 0 20px 20px 20px;
+    margin: 0 4px 4px 4px;
 }
 
 .personnel-page .table-container,
@@ -2857,11 +2875,11 @@ tbody tr:last-child td {
 .training-page .table-container,
 .team-personnel-page .table-container {
     flex: 1;
-    overflow: auto; /* 横向 + 纵向都可滚动 */
+    overflow: auto;
     overflow-x: auto;
     overflow-y: auto;
-    height: calc(100vh - 280px); /* 固定高度，确保它确实是滚动容器 */
-    max-height: calc(100vh - 280px);
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
     border: 1px solid #e9ecef;
     border-radius: 8px;
     background: #ffffff;
@@ -3608,7 +3626,7 @@ tbody tr:last-child td {
 .honor-page .table-container {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 280px);
+    max-height: calc(100vh - 120px);
 }
 
 #honorPagination {
@@ -3629,7 +3647,7 @@ tbody tr:last-child td {
 .patrol-page .table-container {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 280px);
+    max-height: calc(100vh - 120px);
 }
 
 .team-page .table-wrapper {
@@ -3641,7 +3659,7 @@ tbody tr:last-child td {
 
 .team-page .table-container {
     overflow-y: auto;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 120px);
     overflow-x: auto;
     width: 100%;
     box-sizing: border-box;
@@ -3684,7 +3702,7 @@ tbody tr:last-child td {
     }
     
     .team-page .table-container {
-        max-height: calc(100vh - 150px);
+        max-height: calc(100vh - 120px);
     }
 }
 
@@ -5569,9 +5587,9 @@ tbody tr:last-child td {
         border: 1px solid #e9ecef;
         flex: 1;
         -webkit-overflow-scrolling: touch;
-        max-height: calc(100vh - 200px);
+        max-height: calc(100vh - 120px);
         position: relative;
-        padding-bottom: 80px;
+        padding-bottom: 0;
         margin: 0;
     }
 
@@ -5940,7 +5958,7 @@ tbody tr:last-child td {
     }
 
     .table-container {
-        max-height: calc(100vh - 200px);
+        max-height: calc(100vh - 120px);
     }
 
     .table-container table {
